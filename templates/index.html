@@ -3,7 +3,7 @@
 
 <head>
 	<title>Citation Manager</title>
-	<link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link type="text/css" href="{{ url_for('static',filename='css/bootstrap.min.css')}}" rel="stylesheet">
 </head>
 <body>
 	<div class="container">
@@ -20,4 +20,5 @@
 		</div>
 		
 	</div>
+	<script src="{{ url_for('static',filename='js/bootstrap.min.js')}}"></script>
 </body>
