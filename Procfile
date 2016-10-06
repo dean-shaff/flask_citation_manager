@@ -1,1 +1,1 @@
-web: gunicorn flask_citation_manager:app 
+web: gunicorn app:app 
