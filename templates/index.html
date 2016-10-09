@@ -4,7 +4,19 @@
 <head>
 	<title>Citation Manager</title>
 	<link type="text/css" href="{{ url_for('static',filename='css/bootstrap.min.css')}}" rel="stylesheet">
-</head>
+	<script type=text/javascript>
+	  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+	</script>
+<!-- 	<script type="text/x-mathjax-config">
+          MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\(','\)']]}});
+          </script>
+ -->	<script type="text/javascript"
+	   src="https://cdn.mathjax.org/mathjax/latest/MathJax.js">
+	</script>
+<!-- 	<script type="text/javascript"
+            src="{{ url_for('static', filename='js/MathJax.js')}}">
+            </script>
+ --></head>
 <body>
 	<div class="container">
 		<div class="header">
@@ -21,23 +33,30 @@
 	</div>
 	<div class="container">
 			<div class="row">
-				<div class='col-md-4'>
+				<div class='col-md-3'>
 					<ul class="list-group" id='button-list'>
- 						{% for item in cm %}
+<!--  						{% for item in cm %}
 					  		<button type="button" id="button_{{loop.index}}"" class="list-group-item">{{item.title[0]}}</button>
 					  	{% endfor %}
-					</ul>
+ -->					</ul>
 				</div>
 				<div class='col-md-4'>
-					<textarea class="form-control" id="edit_area" rows="10"></textarea>
+					<div id='cit-field'>
+					</div>
+					<textarea class="form-control" id="edit_area" rows="20"></textarea>
+					<div id='submit'>
+					</div>
 				</div>
 				<div class='col-md-4'>
-					<div contenteditable="true" id='html_area'></div>
+					<div id='html_area'></div>
 				</div>
 			</div>
 	</div>	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/styles/default.min.css">
+	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/highlight.min.js"></script>
+	<!-- <script src="{{ url_for('static', filename='js/markdown.js')}}"></script> -->
+	<script src="{{ url_for('static', filename='js/marked.min.js')}}"></script>
 	<script src="{{ url_for('static', filename='js/main.js')}}"></script>
-
 	<script src="{{ url_for('static',filename='js/bootstrap.min.js')}}"></script>
 </body>

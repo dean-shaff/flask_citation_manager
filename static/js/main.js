@@ -1,9 +1,16 @@
-$('#edit_area').on('keydown', function(e){
-	var curEditAreaText = this.value;
-	$('#html_area').html("<h2>"+curEditAreaText+"</h2>");
+var json_data ;
+var attrs = ['Title', 'Author', 'Year', 'Org'];
 
+marked.setOptions({
+  highlight: function (code) {
+    return hljs.highlightAuto(code).value;
+  }
+});
+
+$('#edit_area').on('keydown', function(e){
+	// $('#html_area').html("<h2>"+curEditAreaText+"</h2>");
 	var keyCode = e.keyCode || e.which ; 
-	    if (keyCode === 9) {
+	if (keyCode === 9) {
         e.preventDefault();
         var start = this.selectionStart;
         var end = this.selectionEnd;
@@ -11,22 +18,74 @@ $('#edit_area').on('keydown', function(e){
         var selected = val.substring(start, end);
         var re = /^/gm;
         var count = selected.match(re).length;
-        this.value = val.substring(0, start) + selected.replace(re, '\t') + val.substring(end);
-        this.selectionStart = start;
-        this.selectionEnd = end + count;
+        this.value = val.substring(0, start) + selected.replace(re, '    ') + val.substring(end);
+    	// the business below highlights the tab we just made 
+        // this.selectionStart = start;
+        // this.selectionEnd = end + count;
+        // console.log(markdown.toHTML(text_cur));
     }
+    var text_cur = $('#edit_area').val();
+    $('#html_area').html(marked(text_cur));
+    var html_area = document.getElementById("html_area");
+    // MathJax.Hub.Queue(["Typeset",MathJax.Hub,html_area]);
 });
 
-$(function(){
-	$('.list-group button').click(function(){
-		var index = $(this).index();
-		
-	});
+submit_handler = function(event){
+	var json_data_temp = {}
+	var index = event.data.index;
+	for (var i=0; i<attrs.length; i++){
+		try{
+			var ele = document.getElementById(attrs[i]);
+			var cur_val = $(ele).val(); 
+			if (typeof cur_val != 'undefined'){
+				json_data_temp[attrs[i].toLowerCase()] = cur_val;
+			}
+		}catch(err){
+			console.log(err)
+		}
+	}
+	json_data_temp['note'] = $('#edit_area').val();
+	
+}
+
+
+button_handler = function(){
+	var index = $(this).index();
+	$('#edit_area').val(json_data[index].note);
+	console.log(json_data[0])
+    var text_cur = $('#edit_area').val();
+    $('#html_area').html(marked(text_cur));
+    $('#cit-field').empty();
+    for (var i = 0; i < attrs.length ; i++){
+    	try {
+	    	$('#cit-field').append(function(){
+	    		return $('<div class="form-group"> \
+	    <label for="input-'+attrs[i]+'"+>'+attrs[i]+'</label> \
+	    <input type="text" class="form-control" id="'+attrs[i]+'" placeholder="'+json_data[i][attrs[i].toLowerCase()]+'"> \
+	   </div>')});
+	    } catch (err){
+	    	console.log(err);
+	    }
+    }
+    $('#submit').empty();
+    $('#submit').append(function(){
+    	return $('<button type="button" class="btn">Update</button>').click({index:index},submit_handler);
+    })
+
+
+}
+
+$(document).ready(function(){
+	$.getJSON($SCRIPT_ROOT+"/get_citations",{},
+		function(data){
+			json_data = JSON.parse(data.result);
+			for (var i=0; i<json_data.length; i++){
+				$('.list-group').append(function(){
+					return $("<button type='button' class='list-group-item'>"+json_data[i].title+"</button>").click(button_handler);
+				});
+			}
+		});
+	// new Editor($("edit_area"), $("html_area"));
 });
-// $(document).ready(function(){
-// 	$.get("https://dshaff001.cloudant.com/citation_manager/0", function(data){
-// 			$('#html_area').html(data);
-// 			alert("Load completed")
-// 		}
-// 	);
-// });
+
+
