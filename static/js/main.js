@@ -31,41 +31,52 @@ $('#edit_area').on('keydown', function(e){
 });
 
 submit_handler = function(event){
-	var json_data_temp = {}
+	// console.log(json_data[0]['org']);
+	// var json_data_temp = {}
 	var index = event.data.index;
 	for (var i=0; i<attrs.length; i++){
 		try{
 			var ele = document.getElementById(attrs[i]);
 			var cur_val = $(ele).val(); 
 			if (typeof cur_val != 'undefined'){
-				json_data_temp[attrs[i].toLowerCase()] = cur_val;
+				json_data[index][attrs[i].toLowerCase()] = cur_val;
 			}
 		}catch(err){
 			console.log(err)
 		}
 	}
-	json_data_temp['note'] = $('#edit_area').val();
-	
+	json_data[index]['note'] = $('#edit_area').val();
+	$.ajax({
+      type: "POST",
+      url: $SCRIPT_ROOT+"/get_update",
+      data: JSON.stringify(json_data[index]),
+      success: function(msg){
+        //success method
+        console.log("Message from server: "+msg);
+      },
+      failure: function(msg){
+       //failure message
+        console.log(msg);
+      }
+   });
+
 }
 
 
 button_handler = function(){
 	var index = $(this).index();
 	$('#edit_area').val(json_data[index].note);
-	console.log(json_data[0])
     var text_cur = $('#edit_area').val();
     $('#html_area').html(marked(text_cur));
     $('#cit-field').empty();
     for (var i = 0; i < attrs.length ; i++){
-    	try {
-	    	$('#cit-field').append(function(){
-	    		return $('<div class="form-group"> \
-	    <label for="input-'+attrs[i]+'"+>'+attrs[i]+'</label> \
-	    <input type="text" class="form-control" id="'+attrs[i]+'" placeholder="'+json_data[i][attrs[i].toLowerCase()]+'"> \
-	   </div>')});
-	    } catch (err){
-	    	console.log(err);
-	    }
+		// console.log(json_data[0][attrs[i].toLowerCase()]);
+    	$('#cit-field').append(function(){
+    		return $('<div class="form-group"> \
+    <label for="input-'+attrs[i]+'"+>'+attrs[i]+'</label> \
+    <input type="text" class="form-control" name="'+attrs[i].toLowerCase()+
+    '" id="'+attrs[i]+'" placeholder="'+json_data[index][attrs[i].toLowerCase()]+'"> \
+   </div>')});
     }
     $('#submit').empty();
     $('#submit').append(function(){
