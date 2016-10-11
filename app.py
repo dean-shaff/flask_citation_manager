@@ -1,10 +1,8 @@
 from flask import Flask, render_template, jsonify, request
 import json
-from citation_manager import Citation_Manager 
 from cred import cloudant_api_key as api_key
 from cred import cloudant_pass as api_pass
 import requests
-from entry import Entry 
 import json
 
 app = Flask(__name__)
@@ -89,5 +87,4 @@ def showAbout():
     return render_template("about.html") 
 
 if __name__ == "__main__":
-
-    app.run(debug=True)
+    app.run(debug=False)
