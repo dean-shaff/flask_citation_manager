@@ -90,13 +90,15 @@ button_handler = function(){
     	$('#cit-field').append(function(){
     		return $('<div class="form-group"> \
     <label for="input-'+attrs[i]+'"+>'+attrs[i]+'</label> \
-    <input type="text" class="form-control" name="'+attrs[i].toLowerCase()+
+    <input type="text" class="u-full-width" name="'+attrs[i].toLowerCase()+
     '" id="'+attrs[i]+'" value="'+json_data[index][attrs[i].toLowerCase()]+'"> \
    </div>')});
     }
+    $('#edit_area').height("250px");
+    // console.log($('#edit_area').height());
     $('#submit').empty();
     $('#submit').append(function(){
-    	return $('<button type="button" class="btn">Update</button>').click({index:index},submit_handler);
+    	return $('<button>Update</button>').click({index:index},submit_handler);
     })
 
 
@@ -108,11 +110,12 @@ $(document).ready(function(){
 			json_data = JSON.parse(data.result);
 			for (var i=0; i<json_data.length; i++){
 				$('#button-list').append(function(){
-					var ele = $("<button type='button' id='button_"+i+"' class='list-group-item'>"+json_data[i].title+"</button>");
+					var ele = $("<button id='button_"+i+"'>"+json_data[i].title+"</button>");
 					return ele.click(button_handler);
 				});
 			}
 		});
+
 	// new Editor($("edit_area"), $("html_area"));
 });
 
