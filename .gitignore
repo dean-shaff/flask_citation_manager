@@ -1,2 +1,4 @@
 cred.py
 *.pyc
+*.ipynb
+db_test.py

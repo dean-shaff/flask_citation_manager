@@ -1,53 +1,77 @@
 from flask import Flask, render_template, jsonify, request
 import json
 from citation_manager import Citation_Manager 
-from cred import user
-from cred import password
+from cred import cloudant_api_key as api_key
+from cred import cloudant_pass as api_pass
+import requests
 from entry import Entry 
-import couchdb
+import json
 
 app = Flask(__name__)
-# cloudant_api = "chanduckedstessessedderv"
-# cloudant_pass = "e57dc298e956444f9bda1e13668b338c0a4916f9"
-couch_cred={'user':user,
-            'password':password,
-            'db':"citation_manager"}
-cm = Citation_Manager(couch_cred=couch_cred)
 
-class CloudantHandler(object):
+# couch_cred={'user':user,
+#             'password':password,
+#             'db':"citation_manager"}
 
-    def __init__(self, couch_cred):
+# cm = Citation_Manager(couch_cred=couch_cred)
+# 
+class DatabaseHandler(object):
+
+    def __init__(self, cred):
         """
         Log into the cloudant server and grab the db.
         args:
-            - couch_cred: A python dict with the following keys:
+            - cred: A python dict with the following keys:
                 - db: the name of the database 
-                - username: the username
-                - password: the password
+                - api_key: the api key 
+                - api_pass: the 'password' for the api key
         """
-        self.couch = couchdb.Server("https://{}.cloudant.com/".format(couch_cred['user']))
-        self.couch.resource.credentials = (couch_cred['user'], couch_cred['password'])
-        self.db = self.couch[couch_cred['db']]
+        self.client = requests.session()
+        self.client.auth = (cred['api_key'], cred['api_pass'])
+        self.client.headers = {'Content-Type':'application/json'}
+        self.uri = "https://dshaff001.cloudant.com/{}"
+        self.uri_db = self.uri.format(cred['db']) + "/{}"
 
-    def grab_db(self):
+    def get_db(self):
         """
-        grab the data from the db
+        Get the contents of the entire database 
         """
-        return [dict(self.db[doc]) for doc in self.db]
+        resp = self.client.request("GET", self.uri_db.format("_all_docs"))
+        dat = resp.json()
+        ids = [item['id'] for item in dat['rows']]
+        db_contents = [self.__getitem__(_id) for _id in ids]
+        return db_contents
 
-    def update_db(self,entries):
+    def __getitem__(self,_id):
         """
-        Update the cloudant database.
+        get an item from the database by id
+        args:
+            - id: the id of the db item
         """
-        for entry in entries:
-            self.db.save(entry)
+        resp = self.client.request("GET",self.uri_db.format(_id))
+        return resp.json()
 
+    def update_item(self,data):
+        """
+        Update an item or items in the database
+        args:
+            - data: a python dictionary containing the id of the entry to update.
+                if it doesn't contain id, will create new entry
+        """
+        if isinstance(data, list):
+            pass
+        elif not isinstance(data, list):
+            data = [data]
+        resps = []
+        for item in data:        
+            resp = self.client.request("PUT",self.uri_db.format(item['_id']),data=json.dumps(item))
+            resps.append(resp.json())
+        return resps
 
-ch = CloudantHandler(couch_cred)
 
 @app.route("/get_citations")
 def get_citations():
-    docs = ch.grab_db()
+    docs = ch.get_db()
     return jsonify(result=json.dumps(docs))
 
 @app.route("/")
