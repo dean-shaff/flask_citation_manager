@@ -31,9 +31,15 @@ $('#edit_area').on('keydown', function(e){
 });
 
 submit_handler = function(event){
-	// console.log(json_data[0]['org']);
-	// var json_data_temp = {}
+	/*
+	This function get's called when the 'update' button is pressed.
+	It grabs data from each of the fields in the form, updates the global json_data,
+	and then posts the data to the server.
+	*/
 	var index = event.data.index;
+
+	var button_cit = document.getElementById("button_"+index);
+	// console.log($("button-list").get(index));
 	for (var i=0; i<attrs.length; i++){
 		try{
 			var ele = document.getElementById(attrs[i]);
@@ -46,6 +52,11 @@ submit_handler = function(event){
 		}
 	}
 	json_data[index]['note'] = $('#edit_area').val();
+	// now that we have the json_data dictionary updated
+	// let's update the UI elements
+	$(button_cit).text(json_data[index]['title']);
+	// now lets POST the data to the server so we can update 
+	// the cloudant database.
 	$.ajax({
       type: "POST",
       url: $SCRIPT_ROOT+"/get_update",
@@ -63,6 +74,12 @@ submit_handler = function(event){
 }
 
 button_handler = function(){
+	/*
+	This callback function gets called when citation buttons are pressed. 
+	It generates a form with fields corresponding to the citation data fields.
+	When the update button is pressed, the data gets posted to the server using 
+	the submit_handler callback.
+	*/
 	var index = $(this).index();
 	$('#edit_area').val(json_data[index].note);
     var text_cur = $('#edit_area').val();
@@ -74,7 +91,7 @@ button_handler = function(){
     		return $('<div class="form-group"> \
     <label for="input-'+attrs[i]+'"+>'+attrs[i]+'</label> \
     <input type="text" class="form-control" name="'+attrs[i].toLowerCase()+
-    '" id="'+attrs[i]+'" placeholder="'+json_data[index][attrs[i].toLowerCase()]+'"> \
+    '" id="'+attrs[i]+'" value="'+json_data[index][attrs[i].toLowerCase()]+'"> \
    </div>')});
     }
     $('#submit').empty();
@@ -90,8 +107,9 @@ $(document).ready(function(){
 		function(data){
 			json_data = JSON.parse(data.result);
 			for (var i=0; i<json_data.length; i++){
-				$('.list-group').append(function(){
-					return $("<button type='button' class='list-group-item'>"+json_data[i].title+"</button>").click(button_handler);
+				$('#button-list').append(function(){
+					var ele = $("<button type='button' id='button_"+i+"' class='list-group-item'>"+json_data[i].title+"</button>");
+					return ele.click(button_handler);
 				});
 			}
 		});
