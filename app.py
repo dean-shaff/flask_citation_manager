@@ -9,12 +9,6 @@ import json
 
 app = Flask(__name__)
 
-# couch_cred={'user':user,
-#             'password':password,
-#             'db':"citation_manager"}
-
-# cm = Citation_Manager(couch_cred=couch_cred)
-# 
 class DatabaseHandler(object):
 
     def __init__(self, cred):
@@ -51,12 +45,12 @@ class DatabaseHandler(object):
         resp = self.client.request("GET",self.uri_db.format(_id))
         return resp.json()
 
-    def update_item(self,data):
+    def update_db(self,data):
         """
         Update an item or items in the database
         args:
             - data: a python dictionary containing the id of the entry to update.
-                if it doesn't contain id, will create new entry
+                if it doesn't contain id, will create new entry (not implemented yet)
         """
         if isinstance(data, list):
             pass
@@ -68,23 +62,25 @@ class DatabaseHandler(object):
             resps.append(resp.json())
         return resps
 
+cred = {'api_key':api_key,
+        'api_pass':api_pass,
+        'db':'citation_manager'}
+
+dh = DatabaseHandler(cred)
 
 @app.route("/get_citations")
 def get_citations():
-    docs = ch.get_db()
+    docs = dh.get_db()
     return jsonify(result=json.dumps(docs))
 
 @app.route("/")
 def main():
-    return render_template("index.html",cm=cm,json=cm.create_json())
+    return render_template("index.html")
 
 @app.route('/get_update', methods=['POST'])
 def get_update():
     json_data = request.get_json(force=True)
-    if isinstance(json_data, list):
-        ch.update_db(json_data)
-    else:
-        ch.update_db([json_data])
+    dh.update_db(json_data)
     return "updated"
 
 

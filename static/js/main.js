@@ -62,7 +62,6 @@ submit_handler = function(event){
 
 }
 
-
 button_handler = function(){
 	var index = $(this).index();
 	$('#edit_area').val(json_data[index].note);
