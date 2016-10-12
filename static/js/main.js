@@ -159,15 +159,19 @@ add_handler = function(){
 
 $(document).ready(function(){
 	$.getJSON($SCRIPT_ROOT+"/get_citations",{},
-		function(data){
+		function(data){ 
 			json_data = JSON.parse(data.result);
 			$('#button-list').append(function(){
-				var ele = $("<button id=add_cit>Add Citation</button>");
+				var ele = $("<select class='button-full' id=add_cit> \
+						<option value='add_manual'>Add Manually</option> \
+						<option value='add_arxiv'>Add by Arxiv URL</option> \
+					</select>");
 				return ele.click(add_handler);
 			});
+			$('#button-list').append('<hr>');
 			for (var i=0; i<json_data.length; i++){
 				$('#button-list').append(function(){
-					var ele = $("<button id='button_"+i+"'>"+json_data[i].title+"</button>");
+					var ele = $("<button class='button-full' id='button_"+i+"'>"+json_data[i].title+"</button>");
 					return ele.click(button_handler);
 				});
 			}

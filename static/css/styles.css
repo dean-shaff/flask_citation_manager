@@ -1,8 +1,32 @@
-hr{
-	width:100%;
-	/*border:none;*/
-	padding:none;
-	height:1px;
-	color:#333;
-	/*height:38px;*/
+button{
+	text-transform: none;
 }
+
+.button-full{
+	width:100%;
+}
+
+hr{
+	padding-top:0px; 
+	padding-bottom:0px;
+	margin-top: 1px;
+	margin-bottom: 12px;
+}
+
+.edit-area-full-width{
+	height:250px;
+	width:100%;
+}
+
+.button-bold{
+	font-weight: 600;
+	color:#FFFFFF;
+	font-size: 12px;
+	/*background-color:#F03333;*/
+	/*background-color:#F47070;*/
+}
+
+/*.button-emph{
+	background-color
+}
+*/
