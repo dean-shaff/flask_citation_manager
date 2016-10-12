@@ -23,6 +23,7 @@ class DatabaseHandler(object):
         self.client.headers = {'Content-Type':'application/json'}
         self.uri = "https://dshaff001.cloudant.com/{}"
         self.uri_db = self.uri.format(cred['db']) + "/{}"
+        self.db_name = cred['db']
 
     def get_db(self):
         """
@@ -55,8 +56,13 @@ class DatabaseHandler(object):
         elif not isinstance(data, list):
             data = [data]
         resps = []
-        for item in data:        
-            resp = self.client.request("PUT",self.uri_db.format(item['_id']),data=json.dumps(item))
+        for item in data:
+            try:
+                _id = item['_id']
+                resp = self.client.request("PUT",self.uri_db.format(item['_id']),data=json.dumps(item))
+            except KeyError:
+                print("Creating new entry")
+                resp = self.client.request("POST",self.uri.format(self.db_name),data=json.dumps(item))
             resps.append(resp.json())
         return resps
 
